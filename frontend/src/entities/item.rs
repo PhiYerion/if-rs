@@ -1,16 +1,16 @@
-use backend::items::ItemTrait;
+use backend::items::Item;
 use bevy::prelude::*;
 use bevy_xpbd_3d::components::RigidBody;
 
 struct ItemTemplate {
-    inner: Box<dyn ItemTrait>,
+    inner: Box<dyn Item>,
     model: Handle<Scene>,
     weight: f32,
 }
 
 #[derive(Component)]
 struct ItemComponent {
-    item: Box<dyn ItemTrait>,
+    item: Box<dyn Item>,
 }
 
 #[derive(Bundle)]
@@ -21,7 +21,7 @@ struct ItemBundle {
 }
 
 pub fn create_bundle(
-    item: Box<dyn ItemTrait>,
+    item: Box<dyn Item>,
     model: &'static str,
     assets: &AssetServer,
 ) -> ItemBundle {

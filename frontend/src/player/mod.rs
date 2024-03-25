@@ -1,9 +1,9 @@
+mod actions;
+mod gravity;
 mod movement;
 mod ui;
-mod gravity;
-mod actions;
 
-use backend::items::OreItem;
+use backend::items::ore::{CopperOre, IronOre, Ore};
 use bevy::prelude::*;
 use bevy::window::{CursorGrabMode, PrimaryWindow};
 use bevy_xpbd_3d::components::RigidBody;
@@ -44,8 +44,8 @@ impl Default for Player {
     fn default() -> Self {
         let mut inventory = backend::iams::Inventory::default();
         for i in 0..10 {
-            inventory.add(OreItem::new_iron_ore(i as f32 * 0.5));
-            inventory.add(OreItem::new_copper_ore(i as f32));
+            inventory.add(Ore::<IronOre>::new(i as f32, i as f32, i));
+            inventory.add(Ore::<CopperOre>::new(i as f32, i as f32, i));
         }
 
         Self {
@@ -137,7 +137,6 @@ pub fn spawn_player(
         FloorDetector::default(),
     ));
     commands.spawn(camera);
-
 
     log::debug!("Player spawned");
 }

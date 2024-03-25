@@ -1,5 +1,7 @@
-use std::any::Any;
+use bevy::ecs::bundle::Bundle;
 use std::fmt::Debug;
+
+use crate::as_any::AsAny;
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub enum ItemWeight {
@@ -7,13 +9,19 @@ pub enum ItemWeight {
     Discrete(usize),
 }
 
-pub trait AsAny {
-    fn as_any(&self) -> &dyn Any;
+pub trait SpecificItem:
+    Item + AsAny + Clone + Copy + PartialEq + Debug + Send + Sync + 'static
+{
+    type B: Bundle;
+    type M;
+    fn split(&mut self, amount: Self::M) -> Option<Self>;
 }
 
 /// # Examples:
 /// ```
-/// use backend::items::{ Item, ItemWeight, AsAny };
+/// use backend::items::{ Item, ItemWeight };
+/// use backend::as_any::AsAny;
+/// use backend::anyify;
 ///
 /// #[derive(Debug)]
 /// struct IronOre {
@@ -22,11 +30,8 @@ pub trait AsAny {
 ///     purity: f32,
 /// }
 ///
-/// impl AsAny for IronOre {
-///     fn as_any(&self) -> &dyn std::any::Any {
-///         self
-///     }
-/// }
+/// // Item requires AsAny
+/// anyify!(IronOre);
 ///
 /// // These functions will be in a context where the type does not matter. For instance, when
 /// // listing the amounts of all of the items in a list.
@@ -48,7 +53,7 @@ pub trait AsAny {
 ///     }
 /// }
 /// ```
-pub trait Item: 'static + Sync + Send + Debug + AsAny{
+pub trait Item: 'static + Sync + Send + Debug + AsAny {
     fn type_name(&self) -> &'static str;
     fn type_description(&self) -> &'static str;
     fn amount(&self) -> ItemWeight;
